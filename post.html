@@ -78,34 +78,44 @@ tail_includes:
     <!-- .post-meta -->
   </header>
 
+  <!-- 비밀번호 보호 기능 시작 -->
+  {% if page.password %}
+    <div id="password-protection" class="mb-4">
+      <div class="card border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px;">
+        <div class="card-body text-center text-white p-4">
+          <i class="fas fa-lock fa-2x mb-3"></i>
+          <h4 class="mb-3">🔐 보호된 게시글</h4>
+          <p class="mb-3">이 게시글을 보려면 비밀번호를 입력해주세요</p>
+          <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+              <input 
+                type="password" 
+                id="password-input" 
+                class="form-control mb-3" 
+                placeholder="비밀번호 입력"
+                style="border-radius: 25px; padding: 12px 20px;"
+              >
+              <button 
+                id="password-btn"
+                class="btn btn-light btn-lg"
+                style="border-radius: 25px; padding: 10px 30px; font-weight: bold; color: #667eea;"
+              >
+                <i class="fas fa-key me-2"></i>확인
+              </button>
+            </div>
+          </div>
+          <div id="error-message" class="alert alert-danger mt-3" style="display: none; border-radius: 20px;">
+            <i class="fas fa-exclamation-triangle me-2"></i>비밀번호가 틀렸습니다!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="protected-content" style="display: none;">
+  {% endif %}
+
   <div class="content">
-    {% if page.password %}
-      <div id="locked-content">
-        <p>이 게시물은 비밀번호로 보호되어 있습니다.</p>
-        <input type="password" id="post-password" placeholder="비밀번호 입력">
-        <button onclick="unlockPost()">확인</button>
-        <div id="wrong-pass" style="color:red; display:none;">비밀번호가 틀렸습니다.</div>
-      </div>
-
-      <div id="real-content" style="display:none;">
-        {{ content }}
-      </div>
-
-      <script>
-        function unlockPost() {
-          const input = document.getElementById("post-password").value;
-          const correct = "{{ page.password }}"; // Front Matter의 password 값
-          if (input === correct) {
-            document.getElementById("locked-content").style.display = "none";
-            document.getElementById("real-content").style.display = "block";
-          } else {
-            document.getElementById("wrong-pass").style.display = "block";
-          }
-        }
-      </script>
-    {% else %}
-      {{ content }}
-    {% endif %}
+    {{ content }}
   </div>
 
   <div class="post-tail-wrapper text-muted">
@@ -144,6 +154,7 @@ tail_includes:
       <div class="license-wrapper">
         {% if site.data.locales[lang].copyright.license.template %}
           {% capture _replacement %}
+        <a href="{{ site.baseurl }}/categories/{{ category | slugify | url_encode }}/">{{ category }}</a>
         <a href="{{ site.data.locales[lang].copyright.license.link }}">
           {{ site.data.locales[lang].copyright.license.name }}
         </a>
@@ -159,6 +170,14 @@ tail_includes:
   </div>
   <!-- div.post-tail-wrapper -->
 
+  {% if page.password %}
+    </div> <!-- protected-content 닫기 -->
+    
+    <!-- 비밀번호를 data attribute로 전달 -->
+    <script type="application/json" id="password-data">{"password": "{{ page.password }}"}</script>
+    <script src="{{ '/assets/js/password-protection.js' | relative_url }}"></script>
+  {% endif %}
+
   <script src="https://utteranc.es/client.js"
         repo="oil-lamp-cat/oil-lamp-cat.github.io"
         issue-term="pathname"
@@ -166,4 +185,5 @@ tail_includes:
         crossorigin="anonymous"
         async>
   </script>
+
 </article>
